@@ -1,10 +1,9 @@
-module test/restful
+module proj_sys/back
 
 go 1.19
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.4.2
-	github.com/fjl/go-couchdb v0.1.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/zemirco/couchdb v0.0.0-20170316052722-83ed906ea1f0
 )
@@ -26,10 +25,10 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/zemirco/uid v0.0.0-20160129141151-3763f3c45832 // indirect
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
-	golang.org/x/net v0.3.0 // indirect
+	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
+	golang.org/x/sys v0.0.0-20210806184541-e5e7981a1069 // indirect
+	golang.org/x/text v0.3.6 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
