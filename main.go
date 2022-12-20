@@ -28,6 +28,7 @@ type CouchSensorMessage struct {
 			Timestamp int
 			Time      string
 		}
+		Rx_metadata      []map[string]any `json:"rx_metadata"`
 		Received_at      string
 		Consumed_airtime string
 	} `json:"uplink_message"`
@@ -39,14 +40,7 @@ func getMessageHandler(db couchdb.DatabaseService) mqtt.MessageHandler {
 		var decodedMessage CouchSensorMessage
 		json.Unmarshal(msg.Payload(), &decodedMessage)
 
-		// bytes, err := json.Marshal(decodedMessage)
-		// if err != nil {
-		// 	fmt.Println(err)
-		// 	return
-		// }
-
 		db.Post(&decodedMessage)
-
 	}
 }
 
