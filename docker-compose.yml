@@ -1,0 +1,41 @@
+version: 0.0.4
+
+services:
+
+  couchdb:
+    image: couchdb:2
+    restart: always
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=weatherdata
+    ports:
+      - 5984:5984
+    volumes:
+      - couchdb_data:/opt/couchdb/data
+
+  backend:
+    build:
+      context: backend
+      target: builder
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=couchdb
+      - GIN_MODE=release
+    ports:
+      - 8080:9000
+    depends_on:
+      - couchdb
+
+  listener:
+    build:
+      context: listener
+      target: builder
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=couchdb
+    depends_on:
+      - couchdb
+
+volumes:
+  couchdb_data:
+    driver: local
