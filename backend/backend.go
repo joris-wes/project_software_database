@@ -3,21 +3,24 @@ package main
 import (
 	"fmt"
 	"net/url"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	couchdb "github.com/zemirco/couchdb"
 )
 
 func main() {
-	u, err := url.Parse("http://admin:weatherdata@couchdb:5984/")
+	u, err := url.Parse("http://couchdb:5984/")
 	if err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 
+	fmt.Println("User:", os.Getenv("COUCHDB_USER"))
+	fmt.Println("Password:", os.Getenv("COUCHDB_PASSWORD"))
+	u.User = url.UserPassword(os.Getenv("COUCHDB_USER"), os.Getenv("COUCHDB_PASSWORD"))
+
 	couch, err := couchdb.NewClient(u)
 	if err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 

@@ -3,11 +3,11 @@ version: 0.0.4
 services:
 
   couchdb:
-    image: couchdb:2
+    image: treehouses/couchdb:2.3.0
     restart: always
     environment:
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=weatherdata
+      - COUCHDB_USER=${COUCHDB_USER:-admin}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-password}
     ports:
       - 5984:5984
     volumes:
@@ -17,9 +17,10 @@ services:
     build:
       context: backend
       target: builder
+    restart: always
     environment:
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=couchdb
+      - COUCHDB_USER=${COUCHDB_USER:-admin}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-password}
       - GIN_MODE=release
     ports:
       - 8080:9000
@@ -30,9 +31,13 @@ services:
     build:
       context: listener
       target: builder
+    restart: always
     environment:
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=couchdb
+      - COUCHDB_USER=${COUCHDB_USER:-admin}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-password}
+      - MQTT_URL=${MQTT_URL:-example.com}
+      - MQTT_USER=${MQTT_USER:-user}
+      - MQTT_PASSWORD=${MQTT_PASSWORD:-password}
     depends_on:
       - couchdb
 

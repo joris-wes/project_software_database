@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"os"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	couchdb "github.com/zemirco/couchdb"
@@ -55,15 +56,15 @@ func getConnectHandler() mqtt.OnConnectHandler {
 }
 
 func main() {
-	u, err := url.Parse("http://admin:weatherdata@couchdb:5984/")
+	u, err := url.Parse("http://couchdb:5984/")
 	if err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 
+	u.User = url.UserPassword(os.Getenv("COUCHDB_USER"), os.Getenv("COUCHDB_PASSWORD"))
+
 	couch, err := couchdb.NewClient(u)
 	if err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 
@@ -76,9 +77,9 @@ func main() {
 	db := couch.Use("weatherdata")
 
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker("mqtt://eu1.cloud.thethings.network:1883").SetClientID("project-software-engineering")
-	opts.SetUsername("project-software-engineering@ttn")
-	opts.SetPassword("NNSXS.DTT4HTNBXEQDZ4QYU6SG73Q2OXCERCZ6574RVXI.CQE6IG6FYNJOO2MOFMXZVWZE4GXTCC2YXNQNFDLQL4APZMWU6ZGA")
+	opts.AddBroker(os.Getenv("MQTT_URL")).SetClientID("project-software-engineering")
+	opts.SetUsername(os.Getenv("MQTT_USER"))
+	opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
 
 	opts.SetOnConnectHandler(getConnectHandler())
 	opts.SetDefaultPublishHandler(getMessageHandler(db))
