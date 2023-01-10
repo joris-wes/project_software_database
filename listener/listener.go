@@ -33,28 +33,6 @@ type CouchSensorMessage struct {
 	} `json:"uplink_message"`
 }
 
-func getMessageHandler(db couchdb.DatabaseService) mqtt.MessageHandler {
-	return func(client mqtt.Client, msg mqtt.Message) {
-		fmt.Printf("Topic: %s\n", msg.Topic())
-		var decodedMessage CouchSensorMessage
-		json.Unmarshal(msg.Payload(), &decodedMessage)
-
-		_, err := db.Post(&decodedMessage)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
-func getConnectHandler() mqtt.OnConnectHandler {
-	return func(client mqtt.Client) {
-		fmt.Println("Connected")
-
-		client.Subscribe("$SYS/#", 0, nil)
-		client.Subscribe("#", 0, nil)
-	}
-}
-
 func main() {
 	u, err := url.Parse("http://couchdb:5984/")
 	if err != nil {
@@ -81,8 +59,23 @@ func main() {
 	opts.SetUsername(os.Getenv("MQTT_USER"))
 	opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
 
-	opts.SetOnConnectHandler(getConnectHandler())
-	opts.SetDefaultPublishHandler(getMessageHandler(db))
+	opts.SetOnConnectHandler(func(client mqtt.Client) {
+		fmt.Println("Connected")
+
+		client.Subscribe("$SYS/#", 0, nil)
+		client.Subscribe("#", 0, nil)
+	})
+
+	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
+		fmt.Println("Topic: %s", msg.Topic())
+		var decodedMessage CouchSensorMessage
+		json.Unmarshal(msg.Payload(), &decodedMessage)
+
+		_, err := db.Post(&decodedMessage)
+		if err != nil {
+			panic(err)
+		}
+	})
 
 	client := mqtt.NewClient(opts)
 
