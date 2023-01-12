@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	couchdb "github.com/zemirco/couchdb"
 )
@@ -32,6 +33,7 @@ func main() {
 	device_data := db.View("device-data")
 
 	r := gin.Default()
+	r.Use(cors.Default())
 
 	// Ping for health checks
 	r.GET("/ping", func(c *gin.Context) {
@@ -86,7 +88,11 @@ func main() {
 			c.JSON(500, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(200, view.Rows)
+		values := make([]map[string]any, len(view.Rows))
+		for i, row := range view.Rows {
+			values[i] = row.Value.(map[string]any)
+		}
+		c.JSON(200, values)
 	})
 
 	r.Run(":9000")
