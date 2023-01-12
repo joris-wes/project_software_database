@@ -41,6 +41,20 @@ services:
     depends_on:
       - couchdb
 
+  listener2:
+    build:
+      context: listener
+      target: builder
+    restart: always
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER:-admin}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-password}
+      - MQTT_URL=${MQTT_URL:-example.com}
+      - MQTT_USER=${MQTT_SECOND_USER:-user}
+      - MQTT_PASSWORD=${MQTT_SECOND_PASSWORD:-password}
+    depends_on:
+      - couchdb      
+
 volumes:
   couchdb_data:
     driver: local
