@@ -10,29 +10,6 @@ import (
 	couchdb "github.com/zemirco/couchdb"
 )
 
-type CouchSensorMessage struct {
-	couchdb.Document
-	Recieved_at    string `json:"recieved_at"`
-	End_device_ids struct {
-		Device_id string `json:"device_id"`
-	} `json:"end_device_ids"`
-	Uplink_message struct {
-		Decoded_payload map[string]any `json:"decoded_payload"`
-		Settings        struct {
-			Data_rate struct {
-				Bandwidth        int
-				Spreading_factor int
-			}
-			Frequency string
-			Timestamp int
-			Time      string
-		}
-		Rx_metadata      []map[string]any `json:"rx_metadata"`
-		Received_at      string
-		Consumed_airtime string
-	} `json:"uplink_message"`
-}
-
 func main() {
 	u, err := url.Parse("http://couchdb:5984/")
 	if err != nil {
@@ -67,9 +44,10 @@ func main() {
 	})
 
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-		fmt.Println("Topic: %s", msg.Topic())
+		fmt.Println("Topic:", msg.Topic())
 		var decodedMessage CouchSensorMessage
 		json.Unmarshal(msg.Payload(), &decodedMessage)
+		transformSensor(&decodedMessage)
 
 		_, err := db.Post(&decodedMessage)
 		if err != nil {
