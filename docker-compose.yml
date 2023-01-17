@@ -1,6 +1,21 @@
-version: 0.0.4
+version: '3'
 
 services:
+
+  proxy:
+    image: nginx:1.17.6-alpine
+    volumes:
+      - type: bind
+        source: ./proxy/nginx.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+    ports:
+      - 80:80
+    networks:
+      - client
+    depends_on:
+      - frontend
+      - backend
 
   couchdb:
     image: treehouses/couchdb:2.3.0
@@ -12,6 +27,8 @@ services:
       - 5984:5984
     volumes:
       - couchdb_data:/opt/couchdb/data
+    networks:
+      - database
 
   backend:
     build:
@@ -26,6 +43,9 @@ services:
       - 8080:9000
     depends_on:
       - couchdb
+    networks:
+      - database
+      - client
 
   listener:
     build:
@@ -40,6 +60,26 @@ services:
       - MQTT_PASSWORD=${MQTT_PASSWORD:-password}
     depends_on:
       - couchdb
+    networks:
+      - database
+
+  frontend:
+    build:
+      context: frontend
+      target: builder
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    networks:
+      - client
+
+networks:
+  database:
+    driver: bridge
+  client:
+    driver: bridge
 
 volumes:
   couchdb_data:
