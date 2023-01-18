@@ -77,6 +77,27 @@ func main() {
 		c.JSON(200, view.Rows[0].Value)
 	})
 
+	// Raw data
+	r.GET("/:id/data/raw", func(c *gin.Context) {
+		id := "\"" + c.Param("id") + "\""
+		t := true
+		view, err := device_data.Get(
+			"docs",
+			couchdb.QueryParameters{Key: &id, IncludeDocs: &t},
+		)
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+
+		docs := make([]map[string]any, len(view.Rows))
+		for i, row := range view.Rows {
+			docs[i] = row.Doc
+		}
+
+		c.JSON(200, docs)
+	})
+
 	// Get all data for a device and field
 	r.GET("/:id/data/:kind/:time", func(c *gin.Context) {
 		id := c.Param("id")       // Id of the device
