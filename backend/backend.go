@@ -95,7 +95,7 @@ func main() {
 			docs[i] = row.Doc
 		}
 
-		c.JSON(200, docs)
+		c.IndentedJSON(200, docs)
 	})
 
 	// Get all data for a device and field
