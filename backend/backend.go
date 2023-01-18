@@ -38,12 +38,12 @@ func main() {
 	r.Use(cors.Default())
 
 	// Ping for health checks
-	r.GET("/ping", func(c *gin.Context) {
+	r.GET("/api/ping", func(c *gin.Context) {
 		c.String(200, "pong")
 	})
 
 	// List all devices
-	r.GET("/list", func(c *gin.Context) {
+	r.GET("/api/list", func(c *gin.Context) {
 		t := true // CouchDB library requires a pointer to a bool, so additional variable is needed
 		view, err := device_data.Get(
 			"ids",
@@ -61,7 +61,7 @@ func main() {
 	})
 
 	// Get all fields for a device
-	r.GET("/:id/fields", func(c *gin.Context) {
+	r.GET("/api/:id/fields", func(c *gin.Context) {
 		// CouchDB library does not put quotes around the key when querying
 		// so we have to do it ourselves
 		id := "\"" + c.Param("id") + "\"" // Id of the device
@@ -78,7 +78,7 @@ func main() {
 	})
 
 	// Raw data
-	r.GET("/:id/data/raw", func(c *gin.Context) {
+	r.GET("/api/:id/data/raw", func(c *gin.Context) {
 		id := "\"" + c.Param("id") + "\""
 		t := true
 		view, err := device_data.Get(
@@ -99,7 +99,7 @@ func main() {
 	})
 
 	// Get all data for a device and field
-	r.GET("/:id/data/:kind/:time", func(c *gin.Context) {
+	r.GET("/api/:id/data/:kind/:time", func(c *gin.Context) {
 		id := c.Param("id")       // Id of the device
 		kind := c.Param("kind")   // Kind of data requested
 		period := c.Param("time") // Period of time requested
