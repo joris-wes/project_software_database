@@ -86,6 +86,8 @@ services:
       - MQTT_URL=${MQTT_URL:-example.com}
       - MQTT_USER=${MQTT_SECOND_USER:-user}
       - MQTT_PASSWORD=${MQTT_SECOND_PASSWORD:-password}
+    networks:
+      - database
     depends_on:
       - couchdb 
 
